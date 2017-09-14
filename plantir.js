@@ -79,7 +79,19 @@ app.post('/edit', (req, res) => {
   //   res.redirect('/')
   // })
 
+  var newName = req.body.name;
+  var newInfo = req.body.info;
 
+  if (newName != "") {
+    db.collection('tiles').update( {"_id": ObjectId("59ba67be4320eb2cfe615d03")}, { $set: { name: newName}} );
+  }
+
+  if (newInfo != "") {
+    db.collection('tiles').update( {"_id": ObjectId("59ba67be4320eb2cfe615d03")}, { $set: { info: newInfo}} );
+  }
+
+  console.log("Updated DB");
+  res.redirect('/123')
   //console.log(req.body)
 })
 
