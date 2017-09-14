@@ -12,16 +12,19 @@
 <p>Edit your tile</p>
 <form action="/edit" method="POST">
   <input type="text" placeholder="name" name="name">
+  <input type="text" placeholder="info" name="info">
   <button type="submit">Submit</button>
 </form>
 <hr>
 
   Your tile:
 
-	<ul class="tileprops">
-	  <% for(var i=0; i<tileprops.length; i++) {%>
-	    <li class="plant">
-	      <span><%= tileprops[i].name %></span>
+	<ul class="tiles">
+	  <% for(var i=0; i<tiles.length; i++) {%>
+	    <li class="tile">
+	      <span>id: <%= tiles[i]._id %></span><br>
+	      <span>Name: <%= tiles[i].name %></span><br>
+	      <span>Info: <%= tiles[i].info %></span>
 	    </li>
 	  <% } %>
 	</ul>

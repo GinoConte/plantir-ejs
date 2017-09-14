@@ -3,6 +3,7 @@ var app = express();
 var mongo = require('mongodb');
 var bodyParser= require('body-parser');
 var MongoClient = require('mongodb').MongoClient;
+var ObjectId = require('mongodb').ObjectID;
 
 //react
 // var React = require('react');
@@ -29,10 +30,10 @@ MongoClient.connect('mongodb://admin:admin@ds135514.mlab.com:35514/plantir-db', 
 
 //handlers
 app.get('/', function (req, res) {
-  db.collection('tileprops').find().toArray((err, result) => {
+  db.collection('tiles').find().toArray((err, result) => {
     if (err) return console.log(err)
     // renders index.ejs
-    res.render('index.ejs', {tileprops: result})
+    res.render('index.ejs', {tiles: result})
   })
   //res.sendFile(__dirname + '/index.html')
 
@@ -43,14 +44,42 @@ app.get('/', function (req, res) {
 
 });
 
+//sample code
+app.get('/123', function (req, res) {
+  //find specific
+  db.collection('tiles').find( { _id: ObjectId("59ba67be4320eb2cfe615d03")}).toArray((err, result) => {
+    if (err) return console.log(err)
+    // renders index.ejs
+    res.render('index.ejs', {tiles: result})
+  })
+
+  //console.log(db.collection('tiles').find( { _id: ObjectId("59ba67be4320eb2cfe615d03")}).toArray());
+
+  //res.sendFile(__dirname + '/index.html')
+
+  // db.collection('plants').find().toArray(function(err, results) {
+  //   console.log(results)
+  // // send HTML file populated with quotes here
+  // })
+});
+
 app.post('/edit', (req, res) => {
   //add entry
-  db.collection('tileprops').save(req.body, (err, result) => {
-    if (err) return console.log(err)
+  // db.collection('tiles').save(req.body, (err, result) => {
+  //   if (err) return console.log(err)
 
-    console.log('saved to database')
-    res.redirect('/')
-  })
+  //   console.log('saved to database')
+  //   res.redirect('/')
+  // })
+  // console.log(req.body);
+  // db.collection('tiles').update(req.body, (err, result) => {
+  //   if (err) return console.log(err)
+
+  //   console.log('saved to database')
+  //   res.redirect('/')
+  // })
+
+
   //console.log(req.body)
 })
 
