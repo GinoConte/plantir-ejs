@@ -44,10 +44,29 @@ app.get('/', function (req, res) {
 
 });
 
-//sample code
+//hardcoded url
 app.get('/123', function (req, res) {
   //find specific
   db.collection('tiles').find( { _id: ObjectId("59ba67be4320eb2cfe615d03")}).toArray((err, result) => {
+    if (err) return console.log(err)
+    // renders index.ejs
+    res.render('index.ejs', {tiles: result})
+  })
+
+});
+
+//custom url
+app.get('/garden/:gardenId', function (req, res) {
+  
+  //get garden token from url
+  var gardenIdParam = req.params.gardenId;
+  console.log(gardenIdParam);
+
+  //create ObjectId
+  var gardenObjectId = ObjectId(gardenIdParam);
+
+  //find specific tile | example 59ba67be4320eb2cfe615d03
+  db.collection('tiles').find({_id: gardenObjectId}).toArray((err, result) => {
     if (err) return console.log(err)
     // renders index.ejs
     res.render('index.ejs', {tiles: result})
@@ -57,22 +76,12 @@ app.get('/123', function (req, res) {
 
   //res.sendFile(__dirname + '/index.html')
 
-  // db.collection('plants').find().toArray(function(err, results) {
-  //   console.log(results)
-  // // send HTML file populated with quotes here
-  // })
 });
 
 app.post('/edit', (req, res) => {
+	
   //add entry
   // db.collection('tiles').save(req.body, (err, result) => {
-  //   if (err) return console.log(err)
-
-  //   console.log('saved to database')
-  //   res.redirect('/')
-  // })
-  // console.log(req.body);
-  // db.collection('tiles').update(req.body, (err, result) => {
   //   if (err) return console.log(err)
 
   //   console.log('saved to database')
