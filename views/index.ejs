@@ -28,15 +28,47 @@ getGardenId();
 </script>
 
 <hr>
+<p>Soil properties</p>
+<form action="/changeproperties" method="POST">
+  <select name="soiltype">
+  	<option value="loam">Loam</option>
+  	<option value="sandy">Sandy</option>
+  	<option value="clay">Clay</option>
+  	<option value="silty">Silty</option>
+  	<option value="peaty">Peaty</option>
+  </select>
+  <select name="soilsunlight">
+  	<option value="none">None</option>
+  	<option value="low">Low</option>
+  	<option value="moderate">Moderate</option>
+  	<option value="high">High</option>
+  </select>
+  <select name="soilmoisture">
+  	<option value="none">None</option>
+  	<option value="low">Low</option>
+  	<option value="moderate">Moderate</option>
+  	<option value="high">High</option>
+  	<option value="waterlogged">Waterlogged</option>
+  </select>
+  <input type="hidden" name="gardenid" value="" id="token">
+  <button type="submit">Submit</button>
+</form>
+
+<hr>
 
   Your tile:
-
 	<ul class="tiles">
 	  <% for(var i=0; i<tiles.length; i++) {%>
-	    <li class="tile">
+	    <li class="tile"><b>Tile contains:</b><br>
 	      <span>id: <%= tiles[i]._id %></span><br>
 	      <span>Name: <%= tiles[i].name %></span><br>
-	      <span>Info: <%= tiles[i].info %></span>
+	      <span>Info: <%= tiles[i].info %></span><br>
+	    </li>
+        <li><b>Soil properties:</b><br>
+			<span>Type: <%= tiles[i].properties.type %></span><br>
+	  		<span>pH Balance: <%= tiles[i].properties.ph %></span><br>
+	  		<span>Sunlight: <%= tiles[i].properties.sunlight %></span><br>
+	  		<span>Moisture: <%= tiles[i].properties.moisture %></span>
 	    </li>
 	  <% } %>
 	</ul>

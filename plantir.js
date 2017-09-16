@@ -1,3 +1,12 @@
+//project accounts
+//email: sengplantir@gmail.com
+//passw: sengplantir123
+//
+//url: mongodb://admin:admin@ds135514.mlab.com:35514/plantir-db
+//u: admin
+//p: admin
+
+
 var express = require('express');
 var app = express();
 var mongo = require('mongodb');
@@ -14,12 +23,9 @@ var ObjectId = require('mongodb').ObjectID;
 //middleware
 app.use(bodyParser.urlencoded({extended: true}))
 
-var db
+var db;
 
 //database connection
-//u: admin
-//p: admin
-//url: mongodb://admin:admin@ds135514.mlab.com:35514/plantir-db
 MongoClient.connect('mongodb://admin:admin@ds135514.mlab.com:35514/plantir-db', (err, database) => {
   if (err) return console.log(err)
   db = database
@@ -30,18 +36,50 @@ MongoClient.connect('mongodb://admin:admin@ds135514.mlab.com:35514/plantir-db', 
 
 //homepage
 app.get('/', function (req, res) {
-  db.collection('tiles').find().toArray((err, result) => {
-    if (err) return console.log(err)
+  // db.collection('tiles').find().toArray((err, result) => {
+  //   if (err) return console.log(err)
    
-    // renders index.ejs
-    res.render('index.ejs', {tiles: result})
-  })
+  //   // renders index.ejs
+  //   res.render('index.ejs', {tiles: result})
+  // })
+  res.render('home.ejs');
   //res.sendFile(__dirname + '/index.html')
 
 });
 
 //create new garden token
-app.get('/create', function (req, res) {
+app.post('/create', function (req, res) {
+
+  var generatedToken = new ObjectId();
+  var generatedURL = "/garden/" + generatedToken.valueOf();
+  console.log(generatedURL);
+
+  //sunlight = None | Low | Moderate | High
+  //pH balance => 5 > x > 8
+  //soil type: Sandy | Silty | Clay | Peaty | Loam
+  //moisture : None | Low | Moderate | High | Waterlogged
+  var newTile = {
+  	_id: generatedToken.valueOf(),
+  	name: "Grass",
+  	info: "Non-plant tile.",
+  	properties: {
+  		ph: "6.5",
+  		sunlight: "Moderate",
+  		moisture: "Moderate",
+  		type: "Loam"
+  	}
+  }
+ 
+  db.collection('tiles').save(newTile);
+   
+  // renders index.ejs
+  //res.render('home.ejs', {tiles: result})
+  res.redirect(generatedURL);
+  //res.sendFile(__dirname + '/index.html')
+});
+
+//find an existing token with validation
+app.post('/findtoken', function (req, res) {
 
   var generatedToken = new ObjectId();
   var generatedURL = "/garden/" + generatedToken.valueOf();
@@ -57,10 +95,7 @@ app.get('/create', function (req, res) {
   // renders index.ejs
   //res.render('home.ejs', {tiles: result})
   res.redirect(generatedURL);
-
-
   //res.sendFile(__dirname + '/index.html')
-
 });
 
 //hardcoded url for testing purposes
