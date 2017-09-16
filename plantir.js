@@ -28,23 +28,42 @@ MongoClient.connect('mongodb://admin:admin@ds135514.mlab.com:35514/plantir-db', 
   });
 })
 
-//handlers
+//homepage
 app.get('/', function (req, res) {
   db.collection('tiles').find().toArray((err, result) => {
     if (err) return console.log(err)
+   
     // renders index.ejs
     res.render('index.ejs', {tiles: result})
   })
   //res.sendFile(__dirname + '/index.html')
 
-  // db.collection('plants').find().toArray(function(err, results) {
-  //   console.log(results)
-  // // send HTML file populated with quotes here
-  // })
+});
+
+//create new garden token
+app.get('/create', function (req, res) {
+
+  var generatedToken = new ObjectId();
+  var generatedURL = "/garden/" + generatedToken.valueOf();
+  console.log(generatedURL);
+  var newTile = {
+  	_id: generatedToken.valueOf(),
+  	name: "Grass",
+  	info: "Non-plant tile."
+  }
+ 
+  db.collection('tiles').save(newTile);
+   
+  // renders index.ejs
+  //res.render('home.ejs', {tiles: result})
+  res.redirect(generatedURL);
+
+
+  //res.sendFile(__dirname + '/index.html')
 
 });
 
-//hardcoded url
+//hardcoded url for testing purposes
 app.get('/123', function (req, res) {
   //find specific
   db.collection('tiles').find( { _id: ObjectId("59ba67be4320eb2cfe615d03")}).toArray((err, result) => {
@@ -60,7 +79,7 @@ app.get('/garden/:gardenId', function (req, res) {
   
   //get garden token from url
   var gardenIdParam = req.params.gardenId;
-  console.log(gardenIdParam);
+  //console.log(gardenIdParam);
 
   //create ObjectId
   var gardenObjectId = ObjectId(gardenIdParam);
@@ -72,14 +91,11 @@ app.get('/garden/:gardenId', function (req, res) {
     res.render('index.ejs', {tiles: result})
   })
 
-  //console.log(db.collection('tiles').find( { _id: ObjectId("59ba67be4320eb2cfe615d03")}).toArray());
-
-  //res.sendFile(__dirname + '/index.html')
-
 });
 
+//edit current tile
 app.post('/edit', (req, res) => {
-	
+
   //add entry
   // db.collection('tiles').save(req.body, (err, result) => {
   //   if (err) return console.log(err)
@@ -91,17 +107,27 @@ app.post('/edit', (req, res) => {
   var newName = req.body.name;
   var newInfo = req.body.info;
 
+  //get id from prev url
+  var gardenPath = req.body.gardenid;
+  var idPattern = /garden\/([a-zA-Z0-9]+)/;
+  //console.log(idPattern.exec(gardenId)[1])
+  var gardenObjectId = ObjectId(idPattern.exec(gardenPath)[1]);
+  //console.log(req.body.gardenid);
+
+
   if (newName != "") {
-    db.collection('tiles').update( {"_id": ObjectId("59ba67be4320eb2cfe615d03")}, { $set: { name: newName}} );
+    //db.collection('tiles').update( {"_id": ObjectId("59ba67be4320eb2cfe615d03")}, { $set: { name: newName}} );
+    db.collection('tiles').update( {"_id": gardenObjectId}, { $set: { name: newName}} );
   }
 
   if (newInfo != "") {
-    db.collection('tiles').update( {"_id": ObjectId("59ba67be4320eb2cfe615d03")}, { $set: { info: newInfo}} );
+    db.collection('tiles').update( {"_id": gardenObjectId}, { $set: { info: newInfo}} );
   }
 
   console.log("Updated DB");
-  res.redirect('/123')
-  //console.log(req.body)
+
+  //redirect back to same id page
+  res.redirect(gardenPath);
 })
 
 app.set('view engine', 'ejs')

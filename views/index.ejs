@@ -9,12 +9,24 @@
 </head>
 <body>
 
+
+
 <p>Edit your tile</p>
 <form action="/edit" method="POST">
   <input type="text" placeholder="name" name="name">
   <input type="text" placeholder="info" name="info">
+  <input type="hidden" name="gardenid" value="" id="token">
   <button type="submit">Submit</button>
 </form>
+
+<script>
+function getGardenId() {
+    var id = location.pathname;
+    var x = document.getElementById("token").value = id;
+}
+getGardenId();
+</script>
+
 <hr>
 
   Your tile:
