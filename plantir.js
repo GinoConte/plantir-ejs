@@ -29,6 +29,7 @@ var db;
 MongoClient.connect('mongodb://admin:admin@ds135514.mlab.com:35514/plantir-db', (err, database) => {
   if (err) return console.log(err)
   db = database
+  //only accept connections when the DB is connected
   app.listen(3000, function () {
     console.log('Plantir active on port 3000!');
   });
@@ -50,6 +51,21 @@ app.get('/', function (req, res) {
 //create new garden token
 app.post('/create', function (req, res) {
 
+  //get grass tiletype _id
+  var grassId = "Grass tile not found";
+  // db.collection('tiletypes').find({name:"Grass"}).toArray((err, result) => {
+  //   if (err) return console.log(err);
+  //   console.log(result._id);
+  //   grassId = result._id;
+  // })
+
+
+  //var grassid = ObjectId("59be0f68be5c7140cab1abfd");
+  //***NEEDS TO BE FIXED***
+  //var tiletype = db.collection('tiletypes').find({ "_id": ObjectId("59be0f68be5c7140cab1abfd")}).toArray();
+  //console.log(tiletype);
+  grassId = "59be0f68be5c7140cab1abfd";
+
   var generatedToken = new ObjectId();
   var generatedURL = "/garden/" + generatedToken.valueOf();
   console.log(generatedURL);
@@ -60,8 +76,8 @@ app.post('/create', function (req, res) {
   //moisture : None | Low | Moderate | High | Waterlogged
   var newTile = {
   	_id: generatedToken.valueOf(),
-  	name: "Grass",
-  	info: "Non-plant tile.",
+  	tiletype: "Grass",
+    tiletypeid: grassId,
   	properties: {
   		ph: "6.5",
   		sunlight: "Moderate",
@@ -128,7 +144,52 @@ app.get('/garden/:gardenId', function (req, res) {
 
 });
 
+//change tile type
+app.post('/changetiletype', (req, res) => {
+
+  //db.collection('tiletypes').find({name:"Grass"}).toArray((err, result) => {
+
+  //get id from prev url
+  var gardenPath = req.body.gardenid;
+  var idPattern = /garden\/([a-zA-Z0-9]+)/;
+  //console.log(idPattern.exec(gardenId)[1])
+  var gardenObjectId = ObjectId(idPattern.exec(gardenPath)[1]);
+  //console.log(req.body.gardenid);
+
+  var newTypeName = req.body.tiletype;
+  var newTypeId = "Not found";
+  var newType = [];
+
+  //this is to deal with the asynchronous way database searching happens,
+  //need to make a callback function that essentially executes after
+  //the query takes place
+  function queryForTileType(collection, callback) {
+  	collection.find({ name: newTypeName}).toArray((err, result) => {
+  		if (err) {
+  			console.log(err);
+  		} else if (result.length > 0) {
+  			newType = result;
+  			callback();
+  		}
+  	})
+  }
+
+  queryForTileType(db.collection('tiletypes'), function() {
+  		console.log(newType[0]);
+  		newTypeId = newType[0]._id;
+  		if (newTypeName != "") {
+    		//db.collection('tiles').update( {"_id": ObjectId("59ba67be4320eb2cfe615d03")}, { $set: { name: newName}} );
+    		db.collection('tiles').update( {"_id": gardenObjectId}, { $set: { tiletype: newTypeName, tiletypeid: newTypeId }} );
+  		}
+
+  		console.log("Updated DB");
+  		//redirect back to same id page
+  		res.redirect(gardenPath);
+  })
+})
+
 //edit current tile
+//OLD
 app.post('/edit', (req, res) => {
 
   //add entry
@@ -164,6 +225,75 @@ app.post('/edit', (req, res) => {
   //redirect back to same id page
   res.redirect(gardenPath);
 })
+
+
+
+//generate basic tile types
+app.get('/generate-starter-tiles', function (req, res) {
+
+  //grass tile
+  var generatedToken = new ObjectId();
+  var newTile = {
+  	_id: generatedToken.valueOf(),
+  	name: "Grass",
+  	altname: "",
+  	isPlant: false,
+  	info: "Your beautiful lawn",
+  	tilecolour: "64C949",
+  	requirements: {
+  		watering: "Not required",
+  		blossom: "N/A",
+  		ph: "Between 5.5 and 5.5",
+  		sunlight: "Moderate",
+  		moisture: "Low",
+  		soiltype: "Any"
+  	}
+  }
+  //db.collection('tiletypes').save(newTile);
+
+  //house tile
+  generatedToken = new ObjectId();
+  newTile = {
+  	_id: generatedToken.valueOf(),
+  	name: "House",
+  	altname: "",
+  	isPlant: false,
+  	info: "Hopefully yours",
+  	tilecolour: "FF6A19",
+  	requirements: {
+  		watering: "Not required",
+  		blossom: "N/A",
+  		ph: "N/A",
+  		sunlight: "N/A",
+  		moisture: "N/A",
+  		soiltype: "N/A"
+  	}
+  }
+  //db.collection('tiletypes').save(newTile);
+
+  //sunflower tile
+  generatedToken = new ObjectId();
+  newTile = {
+  	_id: generatedToken.valueOf(),
+  	name: "Sunflower",
+  	altname: "Helianthus Annuus",
+  	isPlant: true,
+  	info: "Sow in garden. Sow seed at a depth approximately three times the diameter of the seed. Best planted at soil temperatures between 10°C and 30°C",
+  	tilecolour: "FF6A19",
+  	requirements: {
+  		watering: "Weekly",
+  		blossom: "Mid-summer to early-autumn",
+  		ph: "Between 6.4 and 7.7",
+  		sunlight: "High",
+  		moisture: "Moderate",
+  		soiltype: "Any"
+  	}
+  }
+  //db.collection('tiletypes').save(newTile);
+   
+  res.redirect("/");
+});
+
 
 app.set('view engine', 'ejs')
 
