@@ -37,15 +37,7 @@ MongoClient.connect('mongodb://admin:admin@ds135514.mlab.com:35514/plantir-db', 
 
 //homepage
 app.get('/', function (req, res) {
-  // db.collection('tiles').find().toArray((err, result) => {
-  //   if (err) return console.log(err)
-   
-  //   // renders index.ejs
-  //   res.render('index.ejs', {tiles: result})
-  // })
   res.render('home.ejs');
-  //res.sendFile(__dirname + '/index.html')
-
 });
 
 //create new garden token
@@ -162,7 +154,7 @@ app.post('/changetiletype', (req, res) => {
 
   //this is to deal with the asynchronous way database searching happens,
   //need to make a callback function that essentially executes after
-  //the query takes place
+  //the query finishes searching
   function queryForTileType(collection, callback) {
   	collection.find({ name: newTypeName}).toArray((err, result) => {
   		if (err) {
@@ -186,6 +178,52 @@ app.post('/changetiletype', (req, res) => {
   		//redirect back to same id page
   		res.redirect(gardenPath);
   })
+})
+
+//change/set tile properties
+//OLD
+app.post('/changeprops', (req, res) => {
+
+  //add entry
+  // db.collection('tiles').save(req.body, (err, result) => {
+  //   if (err) return console.log(err)
+
+  //   console.log('saved to database')
+  //   res.redirect('/')
+  // })
+
+  var newSoilType = req.body.soiltype;
+  //var newph = req.body.ph;
+  var newSunlight = req.body.soilsunlight;
+  var newMoisture = req.body.soilmoisture;
+
+  //get id from prev url
+  var gardenPath = req.body.gardenid;
+  var idPattern = /garden\/([a-zA-Z0-9]+)/;
+  //console.log(idPattern.exec(gardenId)[1])
+  var gardenObjectId = ObjectId(idPattern.exec(gardenPath)[1]);
+  //console.log(req.body.gardenid);
+
+
+  if (newSoilType != "") {
+  	console.log(newSoilType);
+    //db.collection('tiles').update( {"_id": ObjectId("59ba67be4320eb2cfe615d03")}, { $set: { name: newName}} );
+    db.collection('tiles').update( {"_id": gardenObjectId}, { $set: { "properties.type": newSoilType}} );
+  }
+  if (newSunlight != "") {
+    //db.collection('tiles').update( {"_id": ObjectId("59ba67be4320eb2cfe615d03")}, { $set: { name: newName}} );
+    db.collection('tiles').update( {"_id": gardenObjectId}, { $set: { "properties.sunlight": newSunlight}} );
+  }
+  if (newMoisture != "") {
+    //db.collection('tiles').update( {"_id": ObjectId("59ba67be4320eb2cfe615d03")}, { $set: { name: newName}} );
+    db.collection('tiles').update( {"_id": gardenObjectId}, { $set: { "properties.moisture": newMoisture}} );
+  }
+
+
+  console.log("Updated " + gardenPath);
+
+  //redirect back to same id page
+  res.redirect(gardenPath);
 })
 
 //edit current tile

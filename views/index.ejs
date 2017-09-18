@@ -13,12 +13,11 @@
 
 <p>Edit your tile type</p>
 <form action="/changetiletype" method="POST">
-  <input list="tiletypes" name="tiletype">
-  <datalist id="tiletypes">
-    <option value="House">
-    <option value="Grass">
-    <option value="Sunflower">
-  </datalist>
+  <select name="tiletype">>
+    <option value="House">House</option>
+    <option value="Grass">Grass</option>
+    <option value="Sunflower">Sunflower</option>
+  </select>
   <input type="hidden" name="gardenid" value="" id="token">
   <button type="submit">Change</button>
 </form>
@@ -33,30 +32,41 @@ getGardenId();
 
 <hr>
 <p>Soil properties</p>
-<form action="/changeproperties" method="POST">
+<form action="/changeprops" method="POST">
   <select name="soiltype">
-  	<option value="loam">Loam</option>
-  	<option value="sandy">Sandy</option>
-  	<option value="clay">Clay</option>
-  	<option value="silty">Silty</option>
-  	<option value="peaty">Peaty</option>
+    <option value="Select" selected>Select</option>
+  	<option value="Loam">Loam</option>
+  	<option value="Sandy">Sandy</option>
+  	<option value="Clay">Clay</option>
+  	<option value="Silty">Silty</option>
+  	<option value="Peaty">Peaty</option>
   </select>
   <select name="soilsunlight">
-  	<option value="none">None</option>
-  	<option value="low">Low</option>
-  	<option value="moderate">Moderate</option>
-  	<option value="high">High</option>
+    <option value="Select" selected>Select</option>
+  	<option value="None">None</option>
+  	<option value="Low">Low</option>
+  	<option value="Moderate">Moderate</option>
+  	<option value="High">High</option>
   </select>
   <select name="soilmoisture">
-  	<option value="none">None</option>
-  	<option value="low">Low</option>
-  	<option value="moderate">Moderate</option>
-  	<option value="high">High</option>
-  	<option value="waterlogged">Waterlogged</option>
+    <option value="Select" selected>Select</option>
+  	<option value="None">None</option>
+  	<option value="Low">Low</option>
+  	<option value="Moderate">Moderate</option>
+  	<option value="High">High</option>
+  	<option value="Waterlogged">Waterlogged</option>
   </select>
-  <input type="hidden" name="gardenid" value="" id="token">
+  <input type="hidden" name="gardenid" value="" id="token2">
   <button type="submit">Submit</button>
 </form>
+
+<script>
+function getGardenId() {
+    var id = location.pathname;
+    var x = document.getElementById("token2").value = id;
+}
+getGardenId();
+</script>
 
 <hr>
 
